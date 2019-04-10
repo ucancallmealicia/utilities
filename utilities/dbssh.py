@@ -10,7 +10,7 @@ import pandas as pd
 #add error handling, logging
 #don't forget to close the connection
 class DBConn():
-	#maybe add the config file as an argument
+	"""Class to connect to ArchivesSpace database via SSH and run queries."""
 	def __init__(self, config_file=None):
 		self.config_file = self._get_config(config_file)
 		self.path_to_key = self.config_file['path_to_key']
@@ -27,6 +27,7 @@ class DBConn():
 
 	#looks for user-provided config file. If not present looks in cwd
 	def _get_config(self, cfg):
+		"""Gets config file"""
 		if cfg != None:
 			return cf
 		else:
@@ -34,24 +35,26 @@ class DBConn():
 			return cfg
 
 	def _start_conn(self):
+		"""Starts the connection."""
 		tunnel = sshtunnel.SSHTunnelForwarder((self.ssh_host, self.ssh_port), ssh_username=self.ssh_user, ssh_pkey=self.pkey, remote_bind_address=(self.sql_hostname, self.sql_port))
 		tunnel.start()
 		conn = pymysql.connect(host='127.0.0.1', user=self.sql_username, passwd=self.sql_password, db=self.sql_database, port=tunnel.local_bind_port)
 		return conn, tunnel
 
 	def run_query(self, query):
+		"""Runs a query."""
 		data = pd.read_sql_query(query, self.conn)
 		return(data)
 
 	def close_conn(self):
-		'''close both db connection and ssh server. Must do this before quitting Python.
-		Need to find a way to do this even if user does not call method.
-		'''
+		"""Close both db connection and ssh server. Must do this before quitting Python.
+		Need to find a way to do this even if user does not call method."""
 		self.conn.close()
 		self.tunnel.stop()
 
 	#This works well, but not if the query data requires additional processing
 	def write_output(self, query_data, output_dir, filename):
+		"""Writes the query output to a CSV file."""
 		column_list = list(query_data.columns)
 		datalist = query_data.values.tolist()
 		newfile = open(output_dir + '/' + filename + '_results.csv', 'a', encoding='utf-8', newline='')

@@ -6,7 +6,7 @@ from setuptools import setup
 
 #this should be pretty detailed; generate from function definitions (i.e. Serious Python)
 def readme():
-	with open('README.rst') as f:
+	with open('README.md') as f:
 		return f.read()
 
 setup(name='utilities',
@@ -25,6 +25,6 @@ setup(name='utilities',
           'Operating System :: OS Independent'
           ],
 	  packages=['utilities'],
-	  install_requires=['requests', 'paramiko', 'pymysql', 'sshtunnel', 'pandas'],
+	  install_requires=['requests', 'paramiko', 'pymysql', 'sshtunnel', 'pandas', 'bs4'],
 	  include_package_data=True,
 	  zip_safe=False)

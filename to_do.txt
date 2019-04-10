@@ -1,0 +1,7 @@
+-Fix functions copied from other files
+-Add decorators
+-Organize scripts
+-Docs via Sphinx - write function comments
+-CLI tools?
+-more config options
+-fix errors, uninstall, reinstall

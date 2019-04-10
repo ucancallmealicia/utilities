@@ -22,3 +22,5 @@
 
 #other
 *.README.md.html
+
+*.to_do.txt
