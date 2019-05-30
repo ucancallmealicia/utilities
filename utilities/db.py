@@ -1,8 +1,6 @@
 #Connect to ArchivesSpace database through SSH Tunnel
 
-import paramiko
 import pymysql
-import sshtunnel
 import yaml
 import csv
 import pandas as pd
@@ -13,17 +11,12 @@ class DBConn():
 	"""Class to connect to ArchivesSpace database via SSH and run queries."""
 	def __init__(self, config_file=None):
 		self.config_file = self._get_config(config_file)
-		self.path_to_key = self.config_file['path_to_key']
-		self.pkey = paramiko.RSAKey.from_private_key_file(self.path_to_key)
-		self.sql_hostname = self.config_file['sql_hostname']
-		self.sql_username = self.config_file['sql_username']
-		self.sql_password = self.config_file['sql_password']
-		self.sql_database = self.config_file['sql_database']
-		self.sql_port = self.config_file['sql_port']
-		self.ssh_host = self.config_file['ssh_host']
-		self.ssh_user = self.config_file['ssh_user']
-		self.ssh_port = self.config_file['ssh_port']
-		self.conn, self.tunnel = self._start_conn()
+		self.sql_hostname = self.config_file['local_sql_hostname']
+		self.sql_username = self.config_file['local_sql_username']
+		self.sql_password = self.config_file['local_sql_password']
+		self.sql_database = self.config_file['local_sql_database']
+		self.sql_port = self.config_file['local_sql_port']
+		self.conn = self._start_conn()
 
 	#looks for user-provided config file. If not present looks in cwd
 	def _get_config(self, cfg):
@@ -36,10 +29,8 @@ class DBConn():
 
 	def _start_conn(self):
 		"""Starts the connection."""
-		tunnel = sshtunnel.SSHTunnelForwarder((self.ssh_host, self.ssh_port), ssh_username=self.ssh_user, ssh_pkey=self.pkey, remote_bind_address=(self.sql_hostname, self.sql_port))
-		tunnel.start()
-		conn = pymysql.connect(host='127.0.0.1', user=self.sql_username, passwd=self.sql_password, db=self.sql_database, port=tunnel.local_bind_port)
-		return conn, tunnel
+		connect = pymysql.connect(host=self.sql_hostname, user=self.sql_username, passwd=self.sql_password, db=self.sql_database, port=self.sql_port)
+		return connect
 
 	#what is the point of creating a pandas dataframe and then converting to a list? wouldn't that take longer??
 	def run_query(self, query):
@@ -58,7 +49,6 @@ class DBConn():
 		"""Close both db connection and ssh server. Must do this before quitting Python.
 		Need to find a way to do this even if user does not call method."""
 		self.conn.close()
-		self.tunnel.stop()
 
 	#This works well, but not if the query data requires additional processing
 	def write_output(self, query_data, output_dir, filename):

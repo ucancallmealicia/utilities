@@ -204,12 +204,18 @@ def setdirectory(dirpath=None):
     """Sets a directory. If directory doesn't exist, creates
     a directory."""
     if dirpath is None:
-        directory = input('Please enter path to output directory: ')
-    if os.path.isdir(directory):
+        dirpath = input('Please enter path to output directory: ')
+        dirpath = check_path(dirpath)
+    else:
+        dirpath = check_path(dirpath)
+    return dirpath
+
+def check_path(dirpath):
+    if os.path.isdir(dirpath):
         pass
     else:
-        os.mkdir(directory)
-    return directory
+        os.mkdir(dirpath)
+    return dirpath
 
 #add default args here
 def openoutfile(filepath=None):

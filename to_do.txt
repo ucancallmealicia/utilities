@@ -5,3 +5,4 @@
 -CLI tools?
 -more config options
 -fix errors, uninstall, reinstall
+-Fix dir script

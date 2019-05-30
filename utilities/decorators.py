@@ -1,7 +1,7 @@
 #/usr/bin/python3
 #~/anaconda3/bin/python
 
-import functools, utilities, logging
+import functools, utilities, logging, time
 
 # def keeptime(func):
 #     pass
@@ -17,6 +17,29 @@ def loopit(func):
             func(i, *args, **kwargs)
         return row_num
     return wrapper
+
+def time_it(func):
+    """a decorator that times the execution of a function"""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        elapsedtime = time.time() - start_time
+        m, s = divmod(elapsedtime, 60)
+        h, m = divmod(m, 60)
+        print('Total time elapsed: ' + '%d:%02d:%02d' % (h, m, s) + '\n')
+        return result
+    return wrapper
+
+def keeptime(start):
+    """Calculates how long a function takes to run. Have to initiate
+    the start time at the beginning of the function its used in.
+
+    TODO: Wrapper function"""
+    elapsedtime = time.time() - start
+    m, s = divmod(elapsedtime, 60)
+    h, m = divmod(m, 60)
+    logging.debug('Total time elapsed: ' + '%d:%02d:%02d' % (h, m, s) + '\n')
 
 #ADD TO TESTS FOR DECORATORS
 # @loopit
